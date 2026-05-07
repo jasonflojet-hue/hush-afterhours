@@ -1,0 +1,189 @@
+.main { min-height: 100vh; }
+
+.hero {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10rem 2rem 4rem;
+  background: radial-gradient(ellipse at center, rgba(255,45,155,0.08) 0%, transparent 70%);
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.sub {
+  color: rgba(255,255,255,0.55);
+  max-width: 500px;
+  line-height: 1.8;
+}
+
+.scrollLine {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(255,45,155,0.6), transparent);
+  margin-top: 3rem;
+}
+
+/* FOUNDER */
+.founderSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.founderImg img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 4px;
+  filter: grayscale(20%) contrast(1.05);
+  box-shadow: 0 0 60px rgba(255,45,155,0.2), 0 0 120px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,45,155,0.2);
+}
+
+.founderBio { display: flex; flex-direction: column; gap: 1rem; }
+.sectionLabel {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.founderName {
+  font-size: 2.5rem;
+  font-weight: 400;
+  font-family: 'Playfair Display', serif;
+}
+.founderTitle {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--pink);
+  text-transform: uppercase;
+}
+.founderBio p:last-child {
+  color: rgba(255,255,255,0.6);
+  line-height: 1.9;
+  font-size: 0.95rem;
+}
+
+/* CONTENT */
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+}
+
+.section {
+  margin-bottom: 4rem;
+}
+.section p {
+  color: rgba(255,255,255,0.65);
+  line-height: 1.9;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.pullQuote {
+  border-left: 2px solid var(--pink);
+  padding: 1.5rem 2rem;
+  margin: 3rem 0;
+  background: rgba(255,45,155,0.05);
+}
+.pullQuote p {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.7;
+}
+
+/* DISCONNECT */
+.disconnectSection {
+  margin: 3rem 0;
+  text-align: center;
+}
+.disconnectSvg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+.disconnectCaption {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-top: 1rem;
+}
+
+/* SIGNATURE */
+.signature {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sigPhoto {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,45,155,0.4);
+  filter: grayscale(20%);
+}
+.sigName {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+}
+.sigTitle {
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+/* BRAND BAR */
+.brandBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 4rem;
+  padding: 3rem 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.brandLogo { height: 50px; width: auto; opacity: 0.7; filter: drop-shadow(0 0 10px rgba(212,165,245,0.4)); }
+.brandLogoLarge { height: 70px; width: auto; opacity: 0.7; filter: grayscale(1) brightness(1.5); }
+
+/* CTA */
+.cta {
+  padding: 8rem 2rem;
+  text-align: center;
+  background: radial-gradient(ellipse at center, rgba(155,77,202,0.08) 0%, transparent 70%);
+}
+.ctaTitle { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem; font-weight: 400; }
+.ctaSub { color: rgba(255,255,255,0.5); margin-bottom: 2.5rem; }
+
+@media (max-width: 768px) {
+  .founderSection { grid-template-columns: 1fr; gap: 2rem; }
+}

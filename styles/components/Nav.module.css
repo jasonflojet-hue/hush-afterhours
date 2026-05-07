@@ -1,0 +1,80 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+  transition: all 0.3s ease;
+}
+
+.scrolled {
+  background: rgba(5, 3, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 45, 155, 0.15);
+  padding: 1rem 3rem;
+}
+
+.logo { display: flex; align-items: center; }
+
+.logoImg {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(212, 165, 245, 0.6));
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.links a {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s;
+}
+
+.links a:hover, .active {
+  color: #fff !important;
+  text-shadow: 0 0 15px rgba(255, 45, 155, 0.6);
+}
+
+.loginBtn {
+  padding: 8px 22px !important;
+  border: 1px solid rgba(255, 45, 155, 0.5) !important;
+  color: #ff2d9b !important;
+  transition: all 0.3s !important;
+}
+
+.loginBtn:hover {
+  background: rgba(255, 45, 155, 0.1) !important;
+  box-shadow: 0 0 20px rgba(255, 45, 155, 0.3) !important;
+}
+
+.signout {
+  background: none;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.signout:hover { color: #fff; }
+
+@media (max-width: 768px) {
+  .nav { padding: 1rem 1.5rem; }
+  .links { gap: 1.2rem; }
+  .links a { font-size: 0.65rem; }
+}

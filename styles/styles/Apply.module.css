@@ -1,0 +1,138 @@
+.main { padding-top: 61px; max-width: 680px; margin: 0 auto; padding-bottom: 80px; }
+
+.header { text-align: center; padding: 60px 24px 48px; }
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 300;
+  margin: 16px 0 10px;
+}
+
+.sub { color: rgba(245,240,232,0.45); font-size: 14px; }
+
+.form { padding: 0 24px; display: flex; flex-direction: column; gap: 0; }
+
+.section {
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 28px 24px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stepLabel {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid rgba(201,169,110,0.2);
+}
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-size: 12px; color: rgba(245,240,232,0.55); letter-spacing: 0.5px; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  color: rgba(245,240,232,0.5);
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: all 0.2s;
+}
+
+.chip:hover { border-color: rgba(201,169,110,0.3); color: rgba(245,240,232,0.8); }
+
+.chipActive {
+  background: rgba(201,169,110,0.15);
+  border-color: rgba(201,169,110,0.4);
+  color: #c9a96e;
+}
+
+.hint { color: rgba(245,240,232,0.3); font-size: 11px; }
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(245,240,232,0.6);
+}
+
+.checkLabel input { width: auto; }
+
+.error {
+  color: #e24b4a;
+  font-size: 13px;
+  text-align: center;
+  padding: 12px;
+}
+
+.submitBtn {
+  background: #c9a96e;
+  color: #060410;
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+  margin: 8px 0 0;
+  transition: opacity 0.2s;
+  width: 100%;
+}
+
+.submitBtn:hover { opacity: 0.85; }
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.successMain {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+}
+
+.successCard {
+  text-align: center;
+  max-width: 440px;
+}
+
+.successIcon {
+  font-size: 40px;
+  color: #c9a96e;
+  margin-bottom: 24px;
+}
+
+.successTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 300;
+  margin-bottom: 16px;
+}
+
+.successSub {
+  color: rgba(245,240,232,0.5);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 640px) {
+  .row2 { grid-template-columns: 1fr; }
+}

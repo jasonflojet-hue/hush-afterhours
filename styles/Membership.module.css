@@ -1,0 +1,170 @@
+.main { padding-top: 61px; }
+
+.hero {
+  text-align: center;
+  padding: 80px 24px 60px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 300;
+  margin: 16px 0 12px;
+}
+
+.sub {
+  color: rgba(245,240,232,0.45);
+  font-size: 14px;
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 60px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tierCard {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.tierCard.featured {
+  border: 1.5px solid rgba(201,169,110,0.4);
+  background: rgba(201,169,110,0.04);
+}
+
+.popularBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(201,169,110,0.15);
+  color: #c9a96e;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(201,169,110,0.3);
+  white-space: nowrap;
+}
+
+.tierLabel {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.tierName {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.tierPrice { margin-bottom: 20px; }
+.priceNum { font-size: 36px; font-weight: 500; font-family: 'Cormorant Garamond', serif; }
+.pricePer { color: rgba(245,240,232,0.35); font-size: 13px; }
+
+.divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 20px; }
+
+.perks {
+  list-style: none;
+  flex: 1;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perk {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(245,240,232,0.65);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.btnFeatured {
+  background: #c9a96e;
+  color: #060410;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+
+.btnFeatured:hover { opacity: 0.85; }
+
+.btnDefault {
+  background: transparent;
+  color: rgba(245,240,232,0.5);
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  border: 0.5px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btnDefault:hover { border-color: rgba(255,255,255,0.3); color: rgba(245,240,232,0.8); }
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  padding: 48px 24px;
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.stat { text-align: center; }
+.statNum { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; color: #c9a96e; margin-bottom: 4px; }
+.statLabel { font-size: 11px; letter-spacing: 1px; color: rgba(245,240,232,0.3); text-transform: uppercase; }
+
+.faq { max-width: 680px; margin: 0 auto; padding: 60px 24px 80px; }
+.faqTitle { margin-bottom: 24px; }
+.faqItem { border-bottom: 0.5px solid rgba(255,255,255,0.07); padding: 18px 0; }
+.faqItem:last-child { border-bottom: none; }
+.faqQ { color: rgba(245,240,232,0.8); font-size: 14px; margin-bottom: 6px; }
+.faqA { color: rgba(245,240,232,0.4); font-size: 13px; line-height: 1.7; }
+
+@media (max-width: 900px) {
+  .tiers { grid-template-columns: 1fr; padding: 40px 24px; }
+  .stats { gap: 40px; }
+}
