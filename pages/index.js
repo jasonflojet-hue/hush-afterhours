@@ -42,7 +42,7 @@ export default function Home() {
             Help us build Hush — Support the founding member experience
           </p>
           <a
-            href="https://ko-fi.com/hushafterhours"
+            href="https://venmo.com/u/hush2026"
             className={styles.donationBannerBtn}
             target="_blank"
             rel="noopener noreferrer"
