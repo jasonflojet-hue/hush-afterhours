@@ -8,6 +8,7 @@ export default function Home() {
   const [name, setName] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [donationBannerVisible, setDonationBannerVisible] = useState(true)
 
   const handleWaitlist = async (e) => {
     e.preventDefault()
@@ -33,6 +34,30 @@ export default function Home() {
       </Head>
 
       <Nav />
+
+      {donationBannerVisible && (
+        <div className={styles.donationBanner}>
+          <span className={styles.donationBannerIcon}>◈</span>
+          <p className={styles.donationBannerText}>
+            Help us build Hush — Support the founding member experience
+          </p>
+          <a
+            href="https://ko-fi.com/hushafterhours"
+            className={styles.donationBannerBtn}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Donate →
+          </a>
+          <button
+            className={styles.donationBannerClose}
+            onClick={() => setDonationBannerVisible(false)}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <main className={styles.main}>
         {/* HERO */}
