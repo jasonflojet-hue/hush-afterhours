@@ -6,6 +6,7 @@ import styles from '../styles/Avatar.module.css'
 export default function AvatarPage() {
   const [step, setStep] = useState('intro')
   const [avatarUrl, setAvatarUrl] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const avaturnContainerRef = useRef(null)
   const sdkRef = useRef(null)
 
@@ -18,23 +19,27 @@ export default function AvatarPage() {
     async function loadAvaturn() {
       if (step !== 'creator' || !avaturnContainerRef.current || sdkRef.current) return
 
+      setIsLoading(true)
+
       try {
         const { AvaturnSDK } = await import('@avaturn/sdk')
 
         const sdk = new AvaturnSDK()
         sdkRef.current = sdk
 
-        // Replace with your actual Avaturn subdomain from developer.avaturn.me
         const subdomain = 'hushaftehourslive'
         const url = `https://${subdomain}.avaturn.dev`
 
         await sdk.init(avaturnContainerRef.current, {
           url,
+          iframeClassName: 'avaturn-iframe',
         })
+
+        // Hide spinner once SDK is ready
+        if (isMounted) setIsLoading(false)
 
         sdk.on('export', async (data) => {
           console.log('AVATURN EXPORT:', data)
-
           if (!isMounted) return
 
           const urlFromExport =
@@ -46,16 +51,10 @@ export default function AvatarPage() {
 
           setAvatarUrl(urlFromExport)
           setStep('done')
-
-          // Optional: send avatar URL to your backend later
-          // await fetch('/api/save-avatar', {
-          //   method: 'POST',
-          //   headers: { 'Content-Type': 'application/json' },
-          //   body: JSON.stringify({ avatarUrl: urlFromExport }),
-          // })
         })
       } catch (error) {
         console.error('Failed to load Avaturn SDK:', error)
+        if (isMounted) setIsLoading(false)
       }
     }
 
@@ -71,10 +70,35 @@ export default function AvatarPage() {
     <>
       <Head>
         <title>Avatar Lab - Hush Afterhours</title>
-        <meta
-          name="description"
-          content="Optional avatar creation for Hush Afterhours beta."
-        />
+        <meta name="description" content="Create your avatar for Hush Afterhours." />
+        <style>{`
+          .avaturn-iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+          }
+          #avaturn-sdk-container iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
       </Head>
 
       <Nav />
@@ -93,9 +117,7 @@ export default function AvatarPage() {
                   <em>yourself.</em>
                 </h1>
                 <p className={styles.sub}>
-                  This is an early preview of Hush avatar technology. You can create a
-                  photorealistic version of yourself — or skip it for now and enter the
-                  experience.
+                  Create a photorealistic version of yourself — or skip it and enter now.
                 </p>
               </div>
             </section>
@@ -103,18 +125,10 @@ export default function AvatarPage() {
             <section className={styles.ctaSection}>
               <h2 className={styles.ctaTitle}>Step inside now.</h2>
               <p className={styles.ctaSub}>
-                Avatar creation is optional during beta. You can always create or update
-                yours later.
+                Avatar creation is optional during beta. You can always create or update yours later.
               </p>
 
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '1rem',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <a
                   href={SPATIAL_LINK}
                   target="_blank"
@@ -128,18 +142,12 @@ export default function AvatarPage() {
                 <button
                   className={styles.createBtn}
                   onClick={() => setStep('creator')}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid #666',
-                    color: '#ccc',
-                  }}
+                  style={{ background: 'transparent', border: '1px solid #666', color: '#ccc' }}
                 >
-                  Test Avatar Creator
+                  Create My Avatar
                 </button>
 
-                <a href="/" className={styles.backBtn}>
-                  Back to Home
-                </a>
+                <a href="/" className={styles.backBtn}>Back to Home</a>
               </div>
             </section>
           </>
@@ -147,43 +155,76 @@ export default function AvatarPage() {
 
         {step === 'creator' && (
           <section className={styles.creatorSection}>
-            <div className={styles.creatorHeader}>
-              <h2 className={styles.creatorTitle}>Avatar Lab</h2>
-              <p className={styles.creatorSub}>
-                Create your avatar here without leaving Hush. When you click Next in the
-                Avaturn interface, we’ll catch the export and move you forward.
-              </p>
-            </div>
+            {/* Loading Spinner */}
+            {isLoading && (
+              <div style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(5,3,10,0.95)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+              }}>
+                {/* Spinning ring */}
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  border: '3px solid rgba(255,45,155,0.2)',
+                  borderTop: '3px solid #ff2d9b',
+                  animation: 'spin 1s linear infinite',
+                  marginBottom: '2rem',
+                }} />
 
-            <div
-              style={{
-                maxWidth: '1100px',
-                margin: '0 auto',
-                padding: '1rem 1rem 2rem',
-              }}
-            >
+                {/* Hush logo text */}
+                <p style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.3em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.4)',
+                  animation: 'pulse 2s ease-in-out infinite',
+                }}>
+                  Building your avatar lab...
+                </p>
+              </div>
+            )}
+
+            {/* Avatar Creator */}
+            <div style={{
+              maxWidth: '1100px',
+              margin: '0 auto',
+              padding: '1rem 1rem 2rem',
+              height: 'calc(100vh - 100px)',
+              minHeight: '600px',
+              display: 'flex',
+              flexDirection: 'column',
+              opacity: isLoading ? 0 : 1,
+              transition: 'opacity 0.5s ease',
+            }}>
               <div
                 ref={avaturnContainerRef}
                 id="avaturn-sdk-container"
                 style={{
+                  flex: 1,
                   width: '100%',
-                  minHeight: '80vh',
-                  border: '1px solid rgba(255,255,255,0.12)',
+                  position: 'relative',
                   borderRadius: '18px',
                   overflow: 'hidden',
                   background: '#0a0711',
                 }}
               />
 
-              <div
-                style={{
-                  marginTop: '24px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '1rem',
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div style={{
+                marginTop: '16px',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '1rem',
+                flexWrap: 'wrap',
+                flexShrink: 0,
+              }}>
                 <a
                   href={SPATIAL_LINK}
                   target="_blank"
@@ -191,9 +232,8 @@ export default function AvatarPage() {
                   className={styles.createBtn}
                   style={{ textDecoration: 'none' }}
                 >
-                  Skip for now — Enter Lounge →
+                  Skip — Enter Lounge →
                 </a>
-
                 <button className={styles.backBtn} onClick={() => setStep('intro')}>
                   Back
                 </button>
@@ -205,11 +245,11 @@ export default function AvatarPage() {
         {step === 'done' && (
           <section className={styles.doneSection}>
             <div className={styles.doneCard}>
-              <div className={styles.doneIcon}>*</div>
-              <h2 className={styles.doneTitle}>You’re ready.</h2>
+              <div className={styles.doneIcon}>✦</div>
+              <h2 className={styles.doneTitle}>You're ready.</h2>
               <p className={styles.doneSub}>
                 {avatarUrl
-                  ? 'Your avatar export was captured. Step inside and experience Hush.'
+                  ? 'Your avatar was captured. Step inside and experience Hush.'
                   : 'Your avatar is ready. Step inside and experience Hush.'}
               </p>
 
@@ -218,11 +258,7 @@ export default function AvatarPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.createBtn}
-                style={{
-                  display: 'inline-block',
-                  textDecoration: 'none',
-                  marginTop: '1.5rem',
-                }}
+                style={{ display: 'inline-block', textDecoration: 'none', marginTop: '1.5rem' }}
               >
                 Enter the Lounge
               </a>
@@ -239,11 +275,7 @@ export default function AvatarPage() {
         )}
 
         <footer className={styles.footer}>
-          <img
-            src="/kontraband-logo.png"
-            alt="KontraBand Entertainment"
-            className={styles.kbLogo}
-          />
+          <img src="/kontraband-logo.png" alt="KontraBand Entertainment" className={styles.kbLogo} />
           <p className={styles.footerText}>
             2026 KontraBand Entertainment LLC - All rights reserved
           </p>
