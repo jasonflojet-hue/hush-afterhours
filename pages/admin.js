@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 
 const SUPABASE_URL = "https://zwdixbqnrvjpirjeurdg.supabase.co";
 const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZGl4YnFucnZqcGlyamV1cmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTI2MzEwNiwiZXhwIjoyMDkwODM5MTA2fQ.dSUsctrMNhx2BuarER6U7UXdJA25-A1X0a0F1X2jA9g";
+const ADMIN_PASSWORD = "boomshakkalaka";
 
-const fetchSignups = async (url, key) => {
+const fetchSignups = async () => {
   const res = await fetch(
-    `${url}/rest/v1/beta_applications?select=*&order=created_at.desc`,
+    `${SUPABASE_URL}/rest/v1/beta_applications?select=*&order=created_at.desc`,
     {
       headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
+        apikey: SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
         "Content-Type": "application/json",
       },
     }
@@ -18,12 +19,12 @@ const fetchSignups = async (url, key) => {
   return res.json();
 };
 
-const updateStatus = async (url, key, id, status) => {
-  const res = await fetch(`${url}/rest/v1/beta_applications?id=eq.${id}`, {
+const updateStatus = async (id, status) => {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/beta_applications?id=eq.${id}`, {
     method: "PATCH",
     headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
+      apikey: SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
       "Content-Type": "application/json",
       Prefer: "return=representation",
     },
@@ -33,12 +34,7 @@ const updateStatus = async (url, key, id, status) => {
   return res.json();
 };
 
-const ADMIN_PASSWORD = "boomshakkalaka";
-
 export default function HushAdmin() {
-  const [url, setUrl] = useState(SUPABASE_URL);
-  const [key, setKey] = useState(SUPABASE_SERVICE_KEY);
-  const [connected, setConnected] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState("");
@@ -50,58 +46,12 @@ export default function HushAdmin() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [updating, setUpdating] = useState(null);
 
-  const checkPassword = () => {
-    if (pwInput === ADMIN_PASSWORD) {
-      setAuthed(true);
-      setPwError("");
-    } else {
-      setPwError("Wrong password.");
-      setPwInput("");
-    }
-  };
-
-  if (!authed) {
-    return (
-      <div style={styles.root}>
-        <div style={styles.loginCard}>
-          <div style={styles.logoRow}>
-            <span style={styles.logoText}>HUSH</span>
-            <span style={styles.logoSub}>ADMIN</span>
-          </div>
-          <p style={styles.loginHint}>Enter password to continue.</p>
-          <input
-            style={styles.input}
-            placeholder="Password"
-            type="password"
-            value={pwInput}
-            onChange={(e) => setPwInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && checkPassword()}
-          />
-          {pwError && <p style={styles.errorText}>{pwError}</p>}
-          <button style={styles.connectBtn} onClick={checkPassword}>
-            Enter →
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const connect = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await fetchSignups(url, key);
-      setSignups(data);
-      setFiltered(data);
-      setConnected(true);
-    } catch {
-      setError("Could not connect. Check your Supabase URL and key.");
-    }
-    setLoading(false);
-  };
+  useEffect(() => {
+    if (!authed) return;
+    loadSignups();
+  }, [authed]);
 
   useEffect(() => {
-    if (!connected) return;
     let result = [...signups];
     if (statusFilter !== "all") result = result.filter((s) => s.status === statusFilter);
     if (search.trim()) {
@@ -114,15 +64,36 @@ export default function HushAdmin() {
       );
     }
     setFiltered(result);
-  }, [search, statusFilter, signups, connected]);
+  }, [search, statusFilter, signups]);
+
+  const loadSignups = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await fetchSignups();
+      setSignups(data);
+      setFiltered(data);
+    } catch {
+      setError("Could not load signups.");
+    }
+    setLoading(false);
+  };
+
+  const checkPassword = () => {
+    if (pwInput === ADMIN_PASSWORD) {
+      setAuthed(true);
+      setPwError("");
+    } else {
+      setPwError("Wrong password.");
+      setPwInput("");
+    }
+  };
 
   const handleStatus = async (id, status) => {
     setUpdating(id);
     try {
-      await updateStatus(url, key, id, status);
-      setSignups((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, status } : s))
-      );
+      await updateStatus(id, status);
+      setSignups((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
     } catch {
       alert("Failed to update status.");
     }
@@ -142,7 +113,7 @@ export default function HushAdmin() {
     return "#c9a84c";
   };
 
-  if (!connected) {
+  if (!authed) {
     return (
       <div style={styles.root}>
         <div style={styles.loginCard}>
@@ -150,23 +121,19 @@ export default function HushAdmin() {
             <span style={styles.logoText}>HUSH</span>
             <span style={styles.logoSub}>ADMIN</span>
           </div>
-          <p style={styles.loginHint}>Enter your Supabase credentials to view signups.</p>
+          <p style={styles.loginHint}>Enter password to continue.</p>
           <input
             style={styles.input}
-            placeholder="Supabase Project URL"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <input
-            style={styles.input}
-            placeholder="Supabase Service Role Key"
-            value={key}
-            onChange={(e) => setKey(e.target.value)}
+            placeholder="Password"
             type="password"
+            value={pwInput}
+            onChange={(e) => setPwInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && checkPassword()}
+            autoFocus
           />
-          {error && <p style={styles.errorText}>{error}</p>}
-          <button style={styles.connectBtn} onClick={connect} disabled={loading}>
-            {loading ? "Connecting..." : "Enter →"}
+          {pwError && <p style={styles.errorText}>{pwError}</p>}
+          <button style={styles.connectBtn} onClick={checkPassword}>
+            Enter →
           </button>
         </div>
       </div>
@@ -208,17 +175,18 @@ export default function HushAdmin() {
           {["all", "pending", "approved", "rejected"].map((f) => (
             <button
               key={f}
-              style={{
-                ...styles.filterBtn,
-                ...(statusFilter === f ? styles.filterBtnActive : {}),
-              }}
+              style={{ ...styles.filterBtn, ...(statusFilter === f ? styles.filterBtnActive : {}) }}
               onClick={() => setStatusFilter(f)}
             >
               {f.toUpperCase()}
             </button>
           ))}
         </div>
+        <button style={styles.refreshBtn} onClick={loadSignups}>↻ Refresh</button>
       </div>
+
+      {error && <p style={{ color: "#ff4466", padding: "0 32px", fontSize: 12 }}>{error}</p>}
+      {loading && <p style={{ color: "#555", padding: "0 32px", fontSize: 12, letterSpacing: 2 }}>LOADING...</p>}
 
       <div style={styles.tableWrap}>
         <table style={styles.table}>
@@ -232,17 +200,13 @@ export default function HushAdmin() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} style={styles.emptyCell}>No signups found.</td>
+                <td colSpan={6} style={styles.emptyCell}>
+                  {loading ? "Loading..." : "No signups found."}
+                </td>
               </tr>
             ) : (
               filtered.map((s, i) => (
-                <tr
-                  key={s.id}
-                  style={{
-                    ...styles.tr,
-                    backgroundColor: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
-                  }}
-                >
+                <tr key={s.id} style={{ ...styles.tr, backgroundColor: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent" }}>
                   <td style={styles.td}>{s.first_name} {s.last_name}</td>
                   <td style={{ ...styles.td, color: "#aaa", fontSize: 13 }}>{s.email}</td>
                   <td style={{ ...styles.td, textAlign: "center" }}>
@@ -258,27 +222,9 @@ export default function HushAdmin() {
                   </td>
                   <td style={styles.td}>
                     <div style={styles.actionRow}>
-                      <button
-                        style={{ ...styles.actionBtn, color: "#00e5a0", borderColor: "#00e5a044" }}
-                        onClick={() => handleStatus(s.id, "approved")}
-                        disabled={updating === s.id || s.status === "approved"}
-                      >
-                        ✓
-                      </button>
-                      <button
-                        style={{ ...styles.actionBtn, color: "#ff4466", borderColor: "#ff446644" }}
-                        onClick={() => handleStatus(s.id, "rejected")}
-                        disabled={updating === s.id || s.status === "rejected"}
-                      >
-                        ✗
-                      </button>
-                      <button
-                        style={{ ...styles.actionBtn, color: "#c9a84c", borderColor: "#c9a84c44" }}
-                        onClick={() => handleStatus(s.id, "pending")}
-                        disabled={updating === s.id || s.status === "pending"}
-                      >
-                        ↩
-                      </button>
+                      <button style={{ ...styles.actionBtn, color: "#00e5a0", borderColor: "#00e5a044" }} onClick={() => handleStatus(s.id, "approved")} disabled={updating === s.id || s.status === "approved"}>✓</button>
+                      <button style={{ ...styles.actionBtn, color: "#ff4466", borderColor: "#ff446644" }} onClick={() => handleStatus(s.id, "rejected")} disabled={updating === s.id || s.status === "rejected"}>✗</button>
+                      <button style={{ ...styles.actionBtn, color: "#c9a84c", borderColor: "#c9a84c44" }} onClick={() => handleStatus(s.id, "pending")} disabled={updating === s.id || s.status === "pending"}>↩</button>
                     </div>
                   </td>
                 </tr>
@@ -290,163 +236,41 @@ export default function HushAdmin() {
 
       <div style={styles.footer}>
         {filtered.length} of {signups.length} applicants shown
-        <button style={styles.refreshBtn} onClick={connect}>↻ Refresh</button>
       </div>
     </div>
   );
 }
 
 const styles = {
-  root: {
-    minHeight: "100vh",
-    backgroundColor: "#080808",
-    color: "#e8e8e8",
-    fontFamily: "'Courier New', monospace",
-    padding: "0 0 40px",
-  },
-  loginCard: {
-    maxWidth: 420,
-    margin: "80px auto",
-    padding: 40,
-    border: "1px solid #222",
-    backgroundColor: "#0d0d0d",
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-  },
+  root: { minHeight: "100vh", backgroundColor: "#080808", color: "#e8e8e8", fontFamily: "'Courier New', monospace", padding: "0 0 40px" },
+  loginCard: { maxWidth: 420, margin: "80px auto", padding: 40, border: "1px solid #222", backgroundColor: "#0d0d0d", display: "flex", flexDirection: "column", gap: 16 },
   logoRow: { display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 },
   logoText: { fontSize: 32, fontWeight: 700, letterSpacing: 8, color: "#c9a84c" },
   logoSub: { fontSize: 11, letterSpacing: 4, color: "#555" },
   loginHint: { fontSize: 12, color: "#555", margin: 0 },
-  input: {
-    background: "#111",
-    border: "1px solid #222",
-    color: "#e8e8e8",
-    padding: "12px 16px",
-    fontSize: 13,
-    fontFamily: "inherit",
-    outline: "none",
-    width: "100%",
-    boxSizing: "border-box",
-  },
+  input: { background: "#111", border: "1px solid #222", color: "#e8e8e8", padding: "12px 16px", fontSize: 13, fontFamily: "inherit", outline: "none", width: "100%", boxSizing: "border-box" },
   errorText: { color: "#ff4466", fontSize: 12, margin: 0 },
-  connectBtn: {
-    background: "#c9a84c",
-    color: "#000",
-    border: "none",
-    padding: "14px",
-    fontSize: 13,
-    fontWeight: 700,
-    letterSpacing: 3,
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "24px 32px",
-    borderBottom: "1px solid #1a1a1a",
-  },
+  connectBtn: { background: "#c9a84c", color: "#000", border: "none", padding: "14px", fontSize: 13, fontWeight: 700, letterSpacing: 3, cursor: "pointer", fontFamily: "inherit" },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", borderBottom: "1px solid #1a1a1a" },
   liveTag: { fontSize: 11, color: "#00e5a0", letterSpacing: 3 },
-  statsRow: {
-    display: "flex",
-    gap: 1,
-    padding: "24px 32px",
-    borderBottom: "1px solid #1a1a1a",
-  },
-  statCard: {
-    flex: 1,
-    padding: "20px 24px",
-    backgroundColor: "#0d0d0d",
-    border: "1px solid #1a1a1a",
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-  },
+  statsRow: { display: "flex", gap: 1, padding: "24px 32px", borderBottom: "1px solid #1a1a1a" },
+  statCard: { flex: 1, padding: "20px 24px", backgroundColor: "#0d0d0d", border: "1px solid #1a1a1a", display: "flex", flexDirection: "column", gap: 6 },
   statNum: { fontSize: 36, fontWeight: 700, letterSpacing: -1 },
   statLabel: { fontSize: 10, letterSpacing: 4, color: "#444" },
-  toolbar: {
-    display: "flex",
-    gap: 16,
-    padding: "20px 32px",
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
-  searchInput: {
-    background: "#0d0d0d",
-    border: "1px solid #222",
-    color: "#e8e8e8",
-    padding: "10px 16px",
-    fontSize: 13,
-    fontFamily: "inherit",
-    outline: "none",
-    width: 260,
-  },
+  toolbar: { display: "flex", gap: 16, padding: "20px 32px", alignItems: "center", flexWrap: "wrap" },
+  searchInput: { background: "#0d0d0d", border: "1px solid #222", color: "#e8e8e8", padding: "10px 16px", fontSize: 13, fontFamily: "inherit", outline: "none", width: 260 },
   filterRow: { display: "flex", gap: 4 },
-  filterBtn: {
-    background: "transparent",
-    border: "1px solid #222",
-    color: "#555",
-    padding: "8px 16px",
-    fontSize: 10,
-    letterSpacing: 2,
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  filterBtnActive: {
-    borderColor: "#c9a84c",
-    color: "#c9a84c",
-  },
+  filterBtn: { background: "transparent", border: "1px solid #222", color: "#555", padding: "8px 16px", fontSize: 10, letterSpacing: 2, cursor: "pointer", fontFamily: "inherit" },
+  filterBtnActive: { borderColor: "#c9a84c", color: "#c9a84c" },
   tableWrap: { padding: "0 32px", overflowX: "auto" },
   table: { width: "100%", borderCollapse: "collapse" },
-  th: {
-    fontSize: 10,
-    letterSpacing: 3,
-    color: "#444",
-    textAlign: "left",
-    padding: "12px 16px",
-    borderBottom: "1px solid #1a1a1a",
-  },
+  th: { fontSize: 10, letterSpacing: 3, color: "#444", textAlign: "left", padding: "12px 16px", borderBottom: "1px solid #1a1a1a" },
   tr: { transition: "background 0.15s" },
   td: { padding: "14px 16px", fontSize: 14, borderBottom: "1px solid #111" },
   emptyCell: { padding: 40, textAlign: "center", color: "#333", fontSize: 13 },
-  badge: {
-    display: "inline-block",
-    padding: "3px 10px",
-    fontSize: 10,
-    letterSpacing: 2,
-    borderRadius: 2,
-  },
+  badge: { display: "inline-block", padding: "3px 10px", fontSize: 10, letterSpacing: 2, borderRadius: 2 },
   actionRow: { display: "flex", gap: 6 },
-  actionBtn: {
-    background: "transparent",
-    border: "1px solid",
-    padding: "5px 10px",
-    cursor: "pointer",
-    fontSize: 13,
-    fontFamily: "inherit",
-    opacity: 0.8,
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "16px 32px",
-    fontSize: 11,
-    color: "#333",
-    letterSpacing: 2,
-    borderTop: "1px solid #1a1a1a",
-    marginTop: 16,
-  },
-  refreshBtn: {
-    background: "transparent",
-    border: "1px solid #222",
-    color: "#555",
-    padding: "6px 14px",
-    fontSize: 11,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    letterSpacing: 2,
-  },
+  actionBtn: { background: "transparent", border: "1px solid", padding: "5px 10px", cursor: "pointer", fontSize: 13, fontFamily: "inherit", opacity: 0.8 },
+  footer: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 32px", fontSize: 11, color: "#333", letterSpacing: 2, borderTop: "1px solid #1a1a1a", marginTop: 16 },
+  refreshBtn: { background: "transparent", border: "1px solid #222", color: "#555", padding: "6px 14px", fontSize: 11, cursor: "pointer", fontFamily: "inherit", letterSpacing: 2 },
 };
