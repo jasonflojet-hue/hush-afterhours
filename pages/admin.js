@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const SUPABASE_URL = "https://zwdixbqnrvjpirjeurdg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZGl4YnFucnZqcGlyamV1cmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjMxMDYsImV4cCI6MjA5MDgzOTEwNn0.zKxLimgp9Y-fyg2nKjqh-jSPLaRhr-GnEGdRkShfmuU ";
+const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZGl4YnFucnZqcGlyamV1cmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTI2MzEwNiwiZXhwIjoyMDkwODM5MTA2fQ.dSUsctrMNhx2BuarER6U7UXdJA25-A1X0a0F1X2jA9g";
 
 const fetchSignups = async (url, key) => {
   const res = await fetch(
@@ -33,10 +33,15 @@ const updateStatus = async (url, key, id, status) => {
   return res.json();
 };
 
+const ADMIN_PASSWORD = "boomshakkalaka";
+
 export default function HushAdmin() {
   const [url, setUrl] = useState(SUPABASE_URL);
-  const [key, setKey] = useState(SUPABASE_ANON_KEY);
+  const [key, setKey] = useState(SUPABASE_SERVICE_KEY);
   const [connected, setConnected] = useState(false);
+  const [authed, setAuthed] = useState(false);
+  const [pwInput, setPwInput] = useState("");
+  const [pwError, setPwError] = useState("");
   const [signups, setSignups] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,6 +49,42 @@ export default function HushAdmin() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [updating, setUpdating] = useState(null);
+
+  const checkPassword = () => {
+    if (pwInput === ADMIN_PASSWORD) {
+      setAuthed(true);
+      setPwError("");
+    } else {
+      setPwError("Wrong password.");
+      setPwInput("");
+    }
+  };
+
+  if (!authed) {
+    return (
+      <div style={styles.root}>
+        <div style={styles.loginCard}>
+          <div style={styles.logoRow}>
+            <span style={styles.logoText}>HUSH</span>
+            <span style={styles.logoSub}>ADMIN</span>
+          </div>
+          <p style={styles.loginHint}>Enter password to continue.</p>
+          <input
+            style={styles.input}
+            placeholder="Password"
+            type="password"
+            value={pwInput}
+            onChange={(e) => setPwInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && checkPassword()}
+          />
+          {pwError && <p style={styles.errorText}>{pwError}</p>}
+          <button style={styles.connectBtn} onClick={checkPassword}>
+            Enter →
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const connect = async () => {
     setLoading(true);
@@ -67,7 +108,8 @@ export default function HushAdmin() {
       const q = search.toLowerCase();
       result = result.filter(
         (s) =>
-          s.name?.toLowerCase().includes(q) ||
+          s.first_name?.toLowerCase().includes(q) ||
+          s.last_name?.toLowerCase().includes(q) ||
           s.email?.toLowerCase().includes(q)
       );
     }
@@ -117,7 +159,7 @@ export default function HushAdmin() {
           />
           <input
             style={styles.input}
-            placeholder="Supabase Anon Key"
+            placeholder="Supabase Service Role Key"
             value={key}
             onChange={(e) => setKey(e.target.value)}
             type="password"
@@ -201,7 +243,7 @@ export default function HushAdmin() {
                     backgroundColor: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
                   }}
                 >
-                  <td style={styles.td}>{s.name || "—"}</td>
+                  <td style={styles.td}>{s.first_name} {s.last_name}</td>
                   <td style={{ ...styles.td, color: "#aaa", fontSize: 13 }}>{s.email}</td>
                   <td style={{ ...styles.td, textAlign: "center" }}>
                     {s.is_18 ? <span style={{ color: "#00e5a0" }}>✓</span> : <span style={{ color: "#ff4466" }}>✗</span>}
