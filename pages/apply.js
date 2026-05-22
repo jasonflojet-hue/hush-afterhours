@@ -25,18 +25,19 @@ export default function Apply() {
       return
     }
 
-const nameParts = form.name.trim().split(' ')
-const firstName = nameParts[0] || ''
-const lastName = nameParts.slice(1).join(' ') || ''
+    setLoading(true)
 
-const { error: dbError } = await supabase.from('beta_applications').insert({
-  first_name: firstName,
-  last_name: lastName,
-  email: form.email.trim().toLowerCase(),
-  is_18: true,
-  status: 'pending',
+    const nameParts = form.name.trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
 
-})
+    const { error: dbError } = await supabase.from('beta_applications').insert({
+      first_name: firstName,
+      last_name: lastName,
+      email: form.email.trim().toLowerCase(),
+      is_18: true,
+      status: 'pending',
+    })
 
     setLoading(false)
 
@@ -78,9 +79,7 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
           <h1 className={styles.title}>Request an invitation.</h1>
           <p className={styles.sub}>Every application is reviewed personally.</p>
         </div>
-
         <form onSubmit={handleSubmit} className={styles.form}>
-
           <div className={styles.field}>
             <label htmlFor="name">Your name</label>
             <input
@@ -93,7 +92,6 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
               autoComplete="name"
             />
           </div>
-
           <div className={styles.field}>
             <label htmlFor="email">Email address</label>
             <input
@@ -106,7 +104,6 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
               autoComplete="email"
             />
           </div>
-
           <label className={styles.checkboxLabel}>
             <input
               type="checkbox"
@@ -115,9 +112,7 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
             />
             <span>I confirm I am 18 years of age or older</span>
           </label>
-
           {error && <p className={styles.error}>{error}</p>}
-
           <button
             type="submit"
             className={styles.submitBtn}
@@ -125,7 +120,6 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
           >
             {loading ? 'Submitting…' : 'Request Access'}
           </button>
-
         </form>
       </main>
     </>
