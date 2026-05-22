@@ -35,20 +35,9 @@ const { error: dbError } = await supabase.from('beta_applications').insert({
   email: form.email.trim().toLowerCase(),
   is_18: true,
   status: 'pending',
-})
-const nameParts = form.name.trim().split(' ')
-const firstName = nameParts[0] || ''
-const lastName = nameParts.slice(1).join(' ') || ''
 
-const { error: dbError } = await supabase.from('beta_applications').insert({
-  first_name: firstName,
-  last_name: lastName,
-  email: form.email.trim().toLowerCase(),
-  is_18: true,
-  status: 'pending',
 })
-That splits "Jason Ward" into first_name: "Jason" and last_name: "Ward" automatically.
-Save the file, commit and push in GitHub Desktop. Should be live in 60 seconds. 🖤
+
     setLoading(false)
 
     if (dbError) {
