@@ -171,6 +171,55 @@
   .betaStripInner { flex-direction: column; text-align: center; }
 }
 
+/* DONATION BANNER */
+.donationBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.7rem 3rem;
+  background: linear-gradient(135deg, rgba(255,194,0,0.1), rgba(255,45,155,0.07));
+  border-bottom: 1px solid rgba(255,194,0,0.22);
+  position: relative;
+  flex-wrap: wrap;
+}
+.donationBannerIcon { color: var(--gold); font-size: 1rem; }
+.donationBannerText {
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.72);
+  margin: 0;
+}
+.donationBannerBtn {
+  display: inline-block;
+  padding: 5px 16px;
+  background: linear-gradient(135deg, #ffc200, #ff9900);
+  color: #000;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.donationBannerBtn:hover { box-shadow: 0 0 20px rgba(255,194,0,0.45); transform: translateY(-1px); }
+.donationBannerClose {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.28);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.donationBannerClose:hover { color: rgba(255,255,255,0.65); }
+
 /* EMAIL CAPTURE */
 .captureForm {
   display: flex;
