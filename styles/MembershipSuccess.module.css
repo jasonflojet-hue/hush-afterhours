@@ -1,0 +1,29 @@
+.main { padding-top: 61px; }
+
+.confirmation {
+  text-align: center;
+  padding: 100px 24px 60px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.icon { color: #c9a96e; font-size: 32px; margin-bottom: 16px; }
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.sub {
+  color: rgba(245,240,232,0.5);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.donationSection {
+  padding: 40px 24px 100px;
+}

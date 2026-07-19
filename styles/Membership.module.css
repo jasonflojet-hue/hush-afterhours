@@ -168,3 +168,94 @@
   .tiers { grid-template-columns: 1fr; padding: 40px 24px; }
   .stats { gap: 40px; }
 }
+
+/* --- Billing period toggle --- */
+.toggleWrap {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 4px;
+  width: fit-content;
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  color: rgba(245,240,232,0.5);
+  font-size: 13px;
+  font-family: 'Jost', sans-serif;
+  padding: 10px 20px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.toggleBtn:hover { color: rgba(245,240,232,0.8); }
+
+.toggleActive {
+  background: rgba(201,169,110,0.15);
+  color: #c9a96e;
+}
+
+.toggleSave {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  background: rgba(201,169,110,0.2);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.savingsNote {
+  color: #c9a96e;
+  font-size: 11px;
+  margin: -12px 0 20px;
+}
+
+.errorMsg {
+  color: #e8776b;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+/* --- Coming Soon (Silver / Gold) cards --- */
+.comingSoon {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+.comingSoon:hover { opacity: 0.7; }
+
+.comingSoonBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.08);
+  color: rgba(245,240,232,0.6);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.15);
+  white-space: nowrap;
+}
+
+.btnLocked {
+  background: transparent;
+  color: rgba(245,240,232,0.3);
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  width: 100%;
+  cursor: not-allowed;
+}

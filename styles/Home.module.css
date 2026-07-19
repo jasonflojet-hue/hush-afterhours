@@ -1,5 +1,10 @@
 .main { min-height: 100vh; }
 
+.donateSection {
+  padding: 60px 24px;
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+}
+
 /* HERO */
 .hero {
   position: relative;

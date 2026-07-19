@@ -18,7 +18,7 @@ export default function Login() {
     setLoading(true); setError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setError(error.message)
-    else router.push('/lounge')
+    else router.push(typeof router.query.next === 'string' ? router.query.next : '/lounge')
     setLoading(false)
   }
 

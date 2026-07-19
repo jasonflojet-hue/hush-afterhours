@@ -25,9 +25,12 @@ create table public.profiles (
   zip_code text,
   energy text,
   newsletter boolean default false,
-  membership_tier text default 'none', -- none, afterhours, hush_gold, black_card
-  membership_status text default 'pending', -- pending, active, cancelled
+  membership_tier text default 'none', -- none, legacy (silver/gold coming soon, not yet purchasable)
+  membership_status text default 'pending', -- pending, active, past_due, canceled
+  billing_period text, -- monthly, annual
   stripe_customer_id text,
+  membership_started_at timestamp with time zone,
+  membership_expires_at timestamp with time zone,
   is_approved boolean default false,
   is_beta_member boolean default false,
   photo_url text,

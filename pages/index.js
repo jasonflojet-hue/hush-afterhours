@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useState } from 'react'
 import Nav from '../components/Nav'
+import DonationWidget from '../components/DonationWidget'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
@@ -70,7 +71,7 @@ export default function Home() {
                 <button type="submit" className={styles.captureBtn} disabled={loading}>
                   {loading ? 'Requesting...' : 'Request Access →'}
                 </button>
-                <p className={styles.captureNote}>Founding members get VIP status for life. Limited spots.</p>
+                <p className={styles.captureNote}>Limited spots. Applications reviewed personally.</p>
               </form>
             ) : (
               <div className={styles.captureSuccess}>
@@ -159,11 +160,16 @@ export default function Home() {
         <section className={styles.betaSection}>
           <div className={styles.betaBox}>
             <img src="/hush-logo.png" alt="Hush" className={styles.betaLogo} />
-            <p className={styles.betaBadge}>⚡ FOUNDING MEMBER BETA</p>
-            <h2 className={styles.betaTitle}>First wave members get VIP for life.</h2>
+            <p className={styles.betaBadge}>⚡ BETA NOW OPEN</p>
+            <h2 className={styles.betaTitle}>Be among the first inside.</h2>
             <p className={styles.betaSub}>Limited spots. Applications reviewed personally within 24–48 hours.</p>
             <a href="/apply" className="btn-gold">Apply now — it's free</a>
           </div>
+        </section>
+
+        {/* DONATE */}
+        <section className={styles.donateSection}>
+          <DonationWidget campaign="homepage_footer" />
         </section>
 
         {/* FOOTER */}
