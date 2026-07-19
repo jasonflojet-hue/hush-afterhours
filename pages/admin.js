@@ -1,34 +1,25 @@
 import { useState, useEffect } from "react";
 
-const SUPABASE_URL = "https://zwdixbqnrvjpirjeurdg.supabase.co";
-const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZGl4YnFucnZqcGlyamV1cmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTI2MzEwNiwiZXhwIjoyMDkwODM5MTA2fQ.dSUsctrMNhx2BuarER6U7UXdJA25-A1X0a0F1X2jA9g";
-const ADMIN_PASSWORD = "boomshakkalaka";
+// No secrets here. The admin password is verified server-side on every
+// request (see pages/api/admin/signups.js) — it's never compared in the
+// browser and the Supabase service-role key never reaches client code.
 
-const fetchSignups = async () => {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/beta_applications?select=*&order=created_at.desc`,
-    {
-      headers: {
-        apikey: SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  if (!res.ok) throw new Error("Failed to fetch");
+const fetchSignups = async (password) => {
+  const res = await fetch("/api/admin/signups", {
+    headers: { "x-admin-password": password },
+  });
+  if (!res.ok) throw new Error(res.status === 401 ? "Unauthorized" : "Failed to fetch");
   return res.json();
 };
 
-const updateStatus = async (id, status) => {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/beta_applications?id=eq.${id}`, {
+const updateStatus = async (id, status, password) => {
+  const res = await fetch("/api/admin/signups", {
     method: "PATCH",
     headers: {
-      apikey: SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
       "Content-Type": "application/json",
-      Prefer: "return=representation",
+      "x-admin-password": password,
     },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ id, status }),
   });
   if (!res.ok) throw new Error("Failed to update");
   return res.json();
@@ -36,6 +27,7 @@ const updateStatus = async (id, status) => {
 
 export default function HushAdmin() {
   const [authed, setAuthed] = useState(false);
+  const [password, setPassword] = useState(""); // kept in memory only; sent per-request, never persisted or bundled
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState("");
   const [signups, setSignups] = useState([]);
@@ -45,11 +37,6 @@ export default function HushAdmin() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [updating, setUpdating] = useState(null);
-
-  useEffect(() => {
-    if (!authed) return;
-    loadSignups();
-  }, [authed]);
 
   useEffect(() => {
     let result = [...signups];
@@ -66,11 +53,11 @@ export default function HushAdmin() {
     setFiltered(result);
   }, [search, statusFilter, signups]);
 
-  const loadSignups = async () => {
+  const loadSignups = async (pw) => {
     setLoading(true);
     setError("");
     try {
-      const data = await fetchSignups();
+      const data = await fetchSignups(pw ?? password);
       setSignups(data);
       setFiltered(data);
     } catch {
@@ -79,11 +66,15 @@ export default function HushAdmin() {
     setLoading(false);
   };
 
-  const checkPassword = () => {
-    if (pwInput === ADMIN_PASSWORD) {
+  const checkPassword = async () => {
+    setPwError("");
+    try {
+      const data = await fetchSignups(pwInput);
+      setPassword(pwInput);
+      setSignups(data);
+      setFiltered(data);
       setAuthed(true);
-      setPwError("");
-    } else {
+    } catch {
       setPwError("Wrong password.");
       setPwInput("");
     }
@@ -92,7 +83,7 @@ export default function HushAdmin() {
   const handleStatus = async (id, status) => {
     setUpdating(id);
     try {
-      await updateStatus(id, status);
+      await updateStatus(id, status, password);
       setSignups((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
     } catch {
       alert("Failed to update status.");
@@ -182,7 +173,7 @@ export default function HushAdmin() {
             </button>
           ))}
         </div>
-        <button style={styles.refreshBtn} onClick={loadSignups}>↻ Refresh</button>
+        <button style={styles.refreshBtn} onClick={() => loadSignups()}>↻ Refresh</button>
       </div>
 
       {error && <p style={{ color: "#ff4466", padding: "0 32px", fontSize: 12 }}>{error}</p>}
