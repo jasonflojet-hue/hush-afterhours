@@ -1,5 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Hardcoded to the correct project (xhwsegndtbsukkrejzkp). Vercel's
+// NEXT_PUBLIC_SUPABASE_URL/ANON_KEY are currently pointed at a different,
+// orphaned project, so this route doesn't depend on that dashboard value at
+// all — it works regardless of what's set there. The anon key below is
+// meant to be public (it's already inlined into every browser bundle site-
+// wide); it's safe to keep in server code, unlike a service-role key.
+const SUPABASE_URL = 'https://xhwsegndtbsukkrejzkp.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod3NlZ25kdGJzdWtrcmVqemtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjA1MDksImV4cCI6MjA5MDgzNjUwOX0.7i6YGjkLSmBSFrNQcLmzED28amp-AZvE4705Sgu3bYA'
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
@@ -9,10 +18,7 @@ export default async function handler(req, res) {
   const RESEND_API_KEY = process.env.RESEND_API_KEY
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    )
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     const { error: dbError } = await supabase
       .from('waitlist')
       .insert({ email, name, created_at: new Date().toISOString() })

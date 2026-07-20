@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import Nav from '../components/Nav'
-import { supabase } from '../lib/supabase'
 import styles from '../styles/Apply.module.css'
 
 export default function Apply() {
@@ -28,30 +27,35 @@ export default function Apply() {
 
     setLoading(true)
 
-    const nameParts = form.name.trim().split(' ')
-    const firstName = nameParts[0] || ''
-    const lastName = nameParts.slice(1).join(' ') || ''
+    try {
+      const res = await fetch('/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          is_18: form.is_18,
+        }),
+      })
+      const data = await res.json()
 
-    const { error: dbError } = await supabase.from('beta_applications').insert({
-      first_name: firstName,
-      last_name: lastName,
-      email: form.email.trim().toLowerCase(),
-      is_18: true,
-      status: 'pending',
-    })
+      setLoading(false)
 
-    setLoading(false)
-
-    if (dbError) {
-      if (dbError.code === '23505') {
-        setError('This email has already been submitted.')
-      } else {
-        setError('Something went wrong. Please try again.')
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Please try again.')
+        return
       }
-      return
-    }
 
-    setSubmitted(true)
+      if (data.alreadyApplied) {
+        setError('This email has already been submitted.')
+        return
+      }
+
+      setSubmitted(true)
+    } catch {
+      setLoading(false)
+      setError('Something went wrong. Please try again.')
+    }
   }
 
   if (submitted) {
