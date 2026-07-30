@@ -3,6 +3,10 @@ import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
+// Hardcoded to the correct project — same reason as lib/supabase.js.
+const SUPABASE_URL = 'https://xhwsegndtbsukkrejzkp.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod3NlZ25kdGJzdWtrcmVqemtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjA1MDksImV4cCI6MjA5MDgzNjUwOX0.7i6YGjkLSmBSFrNQcLmzED28amp-AZvE4705Sgu3bYA'
+
 // Server-side map of the only two purchasable options right now.
 // Client sends 'monthly' | 'annual' — never a raw Stripe price ID —
 // so there's no way to inject an arbitrary/unapproved price from the browser.
@@ -14,7 +18,7 @@ const PRICE_MAP = {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const supabase = createPagesServerClient({ req, res })
+  const supabase = createPagesServerClient({ req, res, supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY })
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) return res.status(401).json({ error: 'Not authenticated' })

@@ -3,6 +3,10 @@ import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
+// Hardcoded to the correct project — same reason as lib/supabase.js.
+const SUPABASE_URL = 'https://xhwsegndtbsukkrejzkp.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod3NlZ25kdGJzdWtrcmVqemtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjA1MDksImV4cCI6MjA5MDgzNjUwOX0.7i6YGjkLSmBSFrNQcLmzED28amp-AZvE4705Sgu3bYA'
+
 // Donations are one-off Checkout sessions (mode: 'payment'), never
 // subscriptions, and never require an account — this route works for both
 // anonymous visitors (footer of the public page) and logged-in members
@@ -32,7 +36,7 @@ export default async function handler(req, res) {
   // user id for record-keeping. Not required.
   let supabaseUserId = null
   try {
-    const supabase = createPagesServerClient({ req, res })
+    const supabase = createPagesServerClient({ req, res, supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY })
     const { data: { session } } = await supabase.auth.getSession()
     supabaseUserId = session?.user?.id || null
   } catch {

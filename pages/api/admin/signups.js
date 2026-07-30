@@ -12,8 +12,9 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
+  // URL hardcoded for the same reason as lib/supabase.js — see that file.
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    'https://xhwsegndtbsukkrejzkp.supabase.co',
     process.env.SUPABASE_SERVICE_ROLE_KEY
   )
 
