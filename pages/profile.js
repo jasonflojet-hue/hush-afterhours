@@ -137,9 +137,16 @@ export default function Profile() {
     )
 
     setSaving(true)
+    // upsert (not update): a fresh signup should always have a profiles row
+    // via the on_auth_user_created trigger, but upsert makes this
+    // self-healing if that trigger ever fails to fire (as it did earlier
+    // tonight after a project pause/restore lost the trigger entirely --
+    // update() against a missing row matches 0 rows and returns no error,
+    // which silently showed "Profile saved." while writing nothing).
     const { error: saveError } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: session.user.id,
         display_name: form.display_name.trim(),
         birth_date: form.birth_date,
         gender: form.gender,
@@ -158,7 +165,6 @@ export default function Profile() {
         mobile_phone: form.mobile_phone.trim(),
         profile_complete: isComplete,
       })
-      .eq('id', session.user.id)
 
     setSaving(false)
 
