@@ -5,8 +5,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 // Service-role client: webhooks have no logged-in user/session, so we need
 // a client that bypasses RLS to write membership status onto profiles.
+// URL hardcoded for the same reason as waitlist.js/apply.js — Vercel's
+// NEXT_PUBLIC_SUPABASE_URL currently points at a different, orphaned
+// project. SUPABASE_SERVICE_ROLE_KEY stays a real env var (it's a genuine
+// secret, unlike the anon key, so it can't be hardcoded here).
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  'https://xhwsegndtbsukkrejzkp.supabase.co',
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
