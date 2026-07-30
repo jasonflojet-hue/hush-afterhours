@@ -1,0 +1,166 @@
+.main { padding-top: 61px; min-height: 100vh; padding-bottom: 80px; }
+
+.hero {
+  text-align: center;
+  padding: 60px 24px 40px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 300;
+  margin: 12px 0 8px;
+}
+
+.sub {
+  color: rgba(245,240,232,0.45);
+  font-size: 14px;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.form {
+  max-width: 640px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.section {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 28px 24px;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  margin-bottom: 18px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: rgba(245,240,232,0.5);
+  text-transform: uppercase;
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: #f5f0e8;
+  font-size: 14px;
+  font-family: 'Jost', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #c9a96e;
+}
+
+.field textarea { resize: vertical; min-height: 90px; }
+
+.hint {
+  font-size: 11px;
+  color: rgba(245,240,232,0.3);
+}
+
+.charCount {
+  font-size: 11px;
+  color: rgba(245,240,232,0.3);
+  text-align: right;
+}
+
+.chipWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: transparent;
+  border: 0.5px solid rgba(255,255,255,0.15);
+  color: rgba(245,240,232,0.6);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'Jost', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.chip:hover { border-color: rgba(201,169,110,0.5); color: #f5f0e8; }
+
+.chipActive {
+  background: rgba(201,169,110,0.15);
+  border-color: #c9a96e;
+  color: #c9a96e;
+}
+
+.errorMsg {
+  color: #e8776b;
+  font-size: 13px;
+  text-align: center;
+}
+
+.successMsg {
+  color: #7ed9a8;
+  font-size: 13px;
+  text-align: center;
+}
+
+.saveBtn {
+  background: #c9a96e;
+  color: #060410;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+
+.saveBtn:hover { opacity: 0.85; }
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.incompleteBanner {
+  background: rgba(201,169,110,0.08);
+  border: 0.5px solid rgba(201,169,110,0.3);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #c9a96e;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: 1fr; }
+}

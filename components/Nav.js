@@ -35,6 +35,7 @@ export default function Nav() {
         {mounted && session ? (
           <>
             <a href="/lounge" className={router.pathname === '/lounge' ? styles.active : ''}>Lounge</a>
+            <a href="/profile" className={router.pathname === '/profile' ? styles.active : ''}>My Profile</a>
             <a href="/avatar" className={router.pathname === '/avatar' ? styles.active : ''}>My Avatar</a>
             <a href="/membership" className={router.pathname === '/membership' ? styles.active : ''}>Membership</a>
             <button onClick={handleSignOut} className={styles.signout}>Sign out</button>

@@ -16,9 +16,27 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true); setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setError(error.message)
-    else router.push(typeof router.query.next === 'string' ? router.query.next : '/lounge')
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    // First-time or incomplete profiles go to /profile instead of the
+    // lounge — no point landing someone in the social feed before other
+    // members can even tell who they are.
+    const explicitNext = typeof router.query.next === 'string' ? router.query.next : null
+    if (explicitNext) {
+      router.push(explicitNext)
+    } else {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('profile_complete')
+        .eq('id', data.user.id)
+        .single()
+      router.push(profile?.profile_complete ? '/lounge' : '/profile')
+    }
     setLoading(false)
   }
 
@@ -27,7 +45,7 @@ export default function Login() {
     setLoading(true); setError('')
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { emailRedirectTo: `${window.location.origin}/lounge` }
+      options: { emailRedirectTo: `${window.location.origin}/profile` }
     })
     if (error) setError(error.message)
     else setMode('check_email')
