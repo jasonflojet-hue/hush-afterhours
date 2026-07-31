@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const SUPABASE_URL = 'https://xhwsegndtbsukkrejzkp.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod3NlZ25kdGJzdWtrcmVqemtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjA1MDksImV4cCI6MjA5MDgzNjUwOX0.7i6YGjkLSmBSFrNQcLmzED28amp-AZvE4705Sgu3bYA'
@@ -10,12 +9,18 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // account_status -- both protected columns the client can't write
 // directly, so this server route is the only path from awaiting_id/
 // needs_info into pending_review.
+//
+// Session comes in as a Bearer token, not a cookie -- see the note in
+// complete-profile.js for why createPagesServerClient() doesn't work here.
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const supabase = createPagesServerClient({ req, res, supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY })
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return res.status(401).json({ error: 'Not authenticated' })
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
+  if (!token) return res.status(401).json({ error: 'Not authenticated' })
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+  if (userError || !user) return res.status(401).json({ error: 'Not authenticated' })
 
   const { path } = req.body || {}
   if (!path || typeof path !== 'string') return res.status(400).json({ error: 'Missing document path' })
@@ -23,7 +28,7 @@ export default async function handler(req, res) {
   // Make sure the path actually belongs to this user's own folder --
   // defense in depth even though storage RLS already enforces this on
   // upload.
-  if (!path.startsWith(`${session.user.id}/`)) {
+  if (!path.startsWith(`${user.id}/`)) {
     return res.status(403).json({ error: 'Invalid document path' })
   }
 
@@ -32,7 +37,7 @@ export default async function handler(req, res) {
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
     .select('account_status')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single()
 
   if (profileError) return res.status(500).json({ error: profileError.message })
@@ -49,7 +54,7 @@ export default async function handler(req, res) {
       account_status: 'pending_review',
       review_notes: null,
     })
-    .eq('id', session.user.id)
+    .eq('id', user.id)
 
   if (updateError) return res.status(500).json({ error: updateError.message })
 

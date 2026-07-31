@@ -69,10 +69,13 @@ export default function AvatarPage() {
           setAvatarUrl(urlFromExport)
           setStep('done')
 
-          if (urlFromExport) {
+          if (urlFromExport && session) {
             fetch('/api/account/complete-avatar', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
               body: JSON.stringify({ avatar_url: urlFromExport }),
             }).catch(() => {})
           }

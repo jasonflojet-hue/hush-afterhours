@@ -122,7 +122,10 @@ export default function VerifyId() {
 
     const res = await fetch('/api/account/submit-id', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: JSON.stringify({ path }),
     })
 

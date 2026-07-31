@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 // Hardcoded to the correct project for the same reason as every other API
 // route tonight — see lib/supabase.js.
@@ -12,14 +11,25 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // confirmed. account_status is a protected column (see migration
 // protect_account_status_columns) so this can ONLY be written here, via
 // the service-role key, never directly from the browser.
+//
+// NOTE: this app's client (lib/supabase.js) uses the plain supabase-js
+// createClient(), which keeps the session in localStorage, not in cookies.
+// createPagesServerClient() (auth-helpers) can only read a session from
+// cookies, so it always came back null here -- every call silently 401'd
+// and profile.js didn't check response.ok before redirecting on, which is
+// exactly why this was never caught until a real live test. Fixed by
+// passing the access token explicitly and verifying it server-side instead.
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const supabase = createPagesServerClient({ req, res, supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY })
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return res.status(401).json({ error: 'Not authenticated' })
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
+  if (!token) return res.status(401).json({ error: 'Not authenticated' })
 
-  if (!session.user.email_confirmed_at) {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+  if (userError || !user) return res.status(401).json({ error: 'Not authenticated' })
+
+  if (!user.email_confirmed_at) {
     return res.status(200).json({ ok: true, skipped: 'email_not_confirmed' })
   }
 
@@ -28,7 +38,7 @@ export default async function handler(req, res) {
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
     .select('account_status, display_name')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single()
 
   if (profileError) return res.status(500).json({ error: profileError.message })
@@ -47,7 +57,7 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'Hush After Hours <sales@hushafterhours.com>',
-        to: session.user.email,
+        to: user.email,
         subject: 'Welcome to Hush After Hours — one more step',
         html: `
           <div style="background:#05030a;color:#f8f4ff;font-family:Helvetica,sans-serif;padding:40px;max-width:520px;margin:0 auto">
@@ -71,7 +81,7 @@ export default async function handler(req, res) {
   const { error: updateError } = await supabaseAdmin
     .from('profiles')
     .update({ account_status: 'awaiting_id', welcome_email_sent_at: new Date().toISOString() })
-    .eq('id', session.user.id)
+    .eq('id', user.id)
 
   if (updateError) return res.status(500).json({ error: updateError.message })
 

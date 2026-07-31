@@ -35,6 +35,7 @@ export default function Nav() {
         {mounted && session ? (
           <>
             <a href="/lounge" className={router.pathname === '/lounge' ? styles.active : ''}>Lounge</a>
+            <a href="/members" className={router.pathname === '/members' ? styles.active : ''}>Members</a>
             <a href="/profile" className={router.pathname === '/profile' ? styles.active : ''}>My Profile</a>
             <a href="/verify-id" className={router.pathname === '/verify-id' ? styles.active : ''}>Verify</a>
             <a href="/avatar" className={router.pathname === '/avatar' ? styles.active : ''}>My Avatar</a>
