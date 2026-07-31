@@ -1,0 +1,130 @@
+.main { padding-top: 61px; min-height: 100vh; padding-bottom: 80px; }
+
+.hero {
+  text-align: center;
+  padding: 60px 24px 40px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 300;
+  margin: 12px 0 8px;
+}
+
+.sub {
+  color: rgba(245,240,232,0.45);
+  font-size: 14px;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.wrap {
+  max-width: 560px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+}
+
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 32px 28px;
+  text-align: center;
+}
+
+.statusBadge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.statusMsg {
+  color: rgba(245,240,232,0.7);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.notesBox {
+  background: rgba(226,75,74,0.08);
+  border: 0.5px solid rgba(226,75,74,0.3);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: #e88f8e;
+  font-size: 13px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.dropZone {
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 32px 20px;
+  cursor: pointer;
+  color: rgba(245,240,232,0.5);
+  font-size: 13px;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.dropZone:hover { border-color: rgba(201,169,110,0.5); }
+
+.fileName {
+  color: #c9a96e;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.uploadBtn {
+  background: #c9a96e;
+  color: #060410;
+  padding: 13px 28px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.uploadBtn:hover { opacity: 0.85; }
+.uploadBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.errorMsg {
+  color: #e8776b;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.hint {
+  font-size: 11px;
+  color: rgba(245,240,232,0.3);
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.ctaBtn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff2d9b, #9b4dca);
+  color: #fff;
+  padding: 13px 30px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.ctaBtn:hover { opacity: 0.85; }

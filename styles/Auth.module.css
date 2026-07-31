@@ -36,6 +36,47 @@
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 11px; letter-spacing: 1px; color: rgba(245,240,232,0.5); text-transform: uppercase; }
 
+/* These inputs previously had no className at all -- rendering as
+   unstyled default browser boxes. Matching Profile.module.css's field
+   treatment for consistency. */
+.field input {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: #f5f0e8;
+  font-size: 14px;
+  font-family: 'Jost', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field input:focus { border-color: #c9a96e; }
+
+.hint {
+  font-size: 11px;
+  color: rgba(245,240,232,0.35);
+}
+
+.strengthTrack {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s, background 0.2s;
+}
+
+.strengthLabel {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
 .error {
   color: #e24b4a;
   font-size: 13px;

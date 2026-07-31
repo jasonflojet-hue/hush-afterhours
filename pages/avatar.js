@@ -1,14 +1,31 @@
 import Head from 'next/head'
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 import Nav from '../components/Nav'
+import { supabase } from '../lib/supabase'
 import styles from '../styles/Avatar.module.css'
 
 export default function AvatarPage() {
+  const router = useRouter()
   const [step, setStep] = useState('intro')
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [session, setSession] = useState(null)
+  const [authChecked, setAuthChecked] = useState(false)
   const avaturnContainerRef = useRef(null)
   const sdkRef = useRef(null)
+
+  // Previously this page had no auth check at all -- anyone could visit it
+  // and export an avatar with nowhere to save. Avatar creation itself stays
+  // open during beta (see the "optional" copy below), but a session is
+  // needed to persist the result to their profile.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setAuthChecked(true)
+      if (!session) router.push('/login?next=/avatar')
+    })
+  }, [])
 
   const SPATIAL_LINK =
     'https://www.spatial.io/s/HUSH-AFTER-HOURS-TEST-69be06ae77252f463df926d2?share=1370638781881802998'
@@ -51,6 +68,14 @@ export default function AvatarPage() {
 
           setAvatarUrl(urlFromExport)
           setStep('done')
+
+          if (urlFromExport) {
+            fetch('/api/account/complete-avatar', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ avatar_url: urlFromExport }),
+            }).catch(() => {})
+          }
         })
       } catch (error) {
         console.error('Failed to load Avaturn SDK:', error)
@@ -65,6 +90,8 @@ export default function AvatarPage() {
       sdkRef.current = null
     }
   }, [step])
+
+  if (!authChecked) return null
 
   return (
     <>

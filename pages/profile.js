@@ -327,6 +327,21 @@ export default function Profile() {
       return
     }
 
+    // First time completing the profile: kick off the welcome/ID-request
+    // email + account_status advance. Fire-and-forget -- account_status is
+    // a protected column the client can't write directly (see
+    // protect_account_status_columns migration), this server route is the
+    // only path. Not blocking the save success message on it.
+    if (!wasComplete && isComplete) {
+      fetch('/api/account/complete-profile', { method: 'POST' })
+        .then(() => {
+          // Brief pause so "Profile saved." is actually visible before we
+          // move them on to the verification step.
+          setTimeout(() => router.push('/verify-id'), 900)
+        })
+        .catch(() => {})
+    }
+
     setWasComplete(isComplete)
     setSuccess('Profile saved.')
   }

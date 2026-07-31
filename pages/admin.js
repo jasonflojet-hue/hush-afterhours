@@ -25,6 +25,27 @@ const updateStatus = async (id, status, password) => {
   return res.json();
 };
 
+const fetchMembers = async (password) => {
+  const res = await fetch("/api/admin/members", {
+    headers: { "x-admin-password": password },
+  });
+  if (!res.ok) throw new Error(res.status === 401 ? "Unauthorized" : "Failed to fetch");
+  return res.json();
+};
+
+const reviewMember = async (id, decision, notes, password) => {
+  const res = await fetch("/api/admin/members", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-password": password,
+    },
+    body: JSON.stringify({ id, decision, notes }),
+  });
+  if (!res.ok) throw new Error("Failed to update");
+  return res.json();
+};
+
 export default function HushAdmin() {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState(""); // kept in memory only; sent per-request, never persisted or bundled
@@ -37,6 +58,11 @@ export default function HushAdmin() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [updating, setUpdating] = useState(null);
+  const [tab, setTab] = useState("applications");
+  const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState("");
+  const [noteDrafts, setNoteDrafts] = useState({});
 
   useEffect(() => {
     let result = [...signups];
@@ -91,6 +117,42 @@ export default function HushAdmin() {
     setUpdating(null);
   };
 
+  const loadMembers = async () => {
+    setMembersLoading(true);
+    setMembersError("");
+    try {
+      const data = await fetchMembers(password);
+      setMembers(data);
+    } catch {
+      setMembersError("Could not load member applications.");
+    }
+    setMembersLoading(false);
+  };
+
+  const openTab = (t) => {
+    setTab(t);
+    if (t === "members") loadMembers();
+  };
+
+  const handleReview = async (id, decision) => {
+    setUpdating(id);
+    try {
+      const notes = noteDrafts[id] || "";
+      await reviewMember(id, decision, notes, password);
+      setMembers((prev) => prev.map((m) => (m.id === id ? { ...m, account_status: decision, review_notes: notes } : m)));
+    } catch {
+      alert("Failed to update this application.");
+    }
+    setUpdating(null);
+  };
+
+  const memberStatusColor = (s) => {
+    if (s === "approved") return "#00e5a0";
+    if (s === "declined") return "#ff4466";
+    if (s === "needs_info") return "#c9a84c";
+    return "#888";
+  };
+
   const stats = {
     total: signups.length,
     pending: signups.filter((s) => s.status === "pending").length,
@@ -141,6 +203,20 @@ export default function HushAdmin() {
         <span style={styles.liveTag}>● LIVE</span>
       </header>
 
+      <div style={{ display: "flex", gap: 4, padding: "16px 32px 0" }}>
+        {[["applications", "BETA APPLICATIONS"], ["members", "MEMBER REVIEW"]].map(([key, label]) => (
+          <button
+            key={key}
+            style={{ ...styles.filterBtn, ...(tab === key ? styles.filterBtnActive : {}) }}
+            onClick={() => openTab(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "applications" && (
+      <>
       <div style={styles.statsRow}>
         {[
           { label: "TOTAL", value: stats.total, color: "#c9a84c" },
@@ -228,6 +304,98 @@ export default function HushAdmin() {
       <div style={styles.footer}>
         {filtered.length} of {signups.length} applicants shown
       </div>
+      </>
+      )}
+
+      {tab === "members" && (
+        <div style={{ padding: "24px 32px" }}>
+          {membersError && <p style={{ color: "#ff4466", fontSize: 12, marginBottom: 12 }}>{membersError}</p>}
+          {membersLoading && <p style={{ color: "#555", fontSize: 12, letterSpacing: 2, marginBottom: 12 }}>LOADING...</p>}
+          <div style={{ marginBottom: 16 }}>
+            <button style={styles.refreshBtn} onClick={loadMembers}>↻ Refresh</button>
+          </div>
+
+          {!membersLoading && members.length === 0 && (
+            <p style={{ color: "#333", fontSize: 13 }}>No applications waiting on review.</p>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {members.map((m) => {
+              const age = m.birth_date
+                ? Math.floor((Date.now() - new Date(m.birth_date).getTime()) / (365.25 * 24 * 3600 * 1000))
+                : null;
+              return (
+                <div key={m.id} style={{ border: "1px solid #1a1a1a", backgroundColor: "#0d0d0d", padding: 20, display: "flex", gap: 20, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {(m.photo_urls || []).slice(0, 3).map((url, i) => (
+                      <img key={i} src={url} alt="" style={{ width: 70, height: 70, objectFit: "cover", borderRadius: 4, border: "1px solid #222" }} />
+                    ))}
+                    {(!m.photo_urls || m.photo_urls.length === 0) && (
+                      <div style={{ width: 70, height: 70, display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontSize: 10, border: "1px solid #222" }}>NO PHOTO</div>
+                    )}
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                      <span style={{ fontSize: 16, fontWeight: 700 }}>{m.display_name || "(no display name)"}</span>
+                      {age !== null && <span style={{ color: "#666", fontSize: 12 }}>{age} yrs</span>}
+                      <span style={{ ...styles.badge, backgroundColor: memberStatusColor(m.account_status) + "22", color: memberStatusColor(m.account_status), border: `1px solid ${memberStatusColor(m.account_status)}44` }}>
+                        {m.account_status}
+                      </span>
+                    </div>
+                    <p style={{ color: "#666", fontSize: 12, margin: "4px 0" }}>{m.city}{m.city && m.state ? ", " : ""}{m.state}</p>
+                    <p style={{ color: "#555", fontSize: 11, margin: "4px 0" }}>
+                      Submitted {m.id_submitted_at ? new Date(m.id_submitted_at).toLocaleString() : "—"}
+                    </p>
+                    {m.id_document_signed_url ? (
+                      <a href={m.id_document_signed_url} target="_blank" rel="noopener noreferrer" style={{ color: "#c9a84c", fontSize: 12 }}>
+                        View submitted ID →
+                      </a>
+                    ) : (
+                      <span style={{ color: "#444", fontSize: 12 }}>No ID document on file</span>
+                    )}
+                    {m.review_notes && (
+                      <p style={{ color: "#e8a13f", fontSize: 12, marginTop: 8 }}><strong>Notes:</strong> {m.review_notes}</p>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 200 }}>
+                    <input
+                      placeholder="Notes (shown to applicant for needs-info/declined)"
+                      value={noteDrafts[m.id] || ""}
+                      onChange={(e) => setNoteDrafts((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                      style={{ ...styles.input, fontSize: 12, padding: "8px 10px" }}
+                    />
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button
+                        style={{ ...styles.actionBtn, color: "#00e5a0", borderColor: "#00e5a044", flex: 1 }}
+                        onClick={() => handleReview(m.id, "approved")}
+                        disabled={updating === m.id}
+                      >
+                        ✓ Approve
+                      </button>
+                      <button
+                        style={{ ...styles.actionBtn, color: "#c9a84c", borderColor: "#c9a84c44", flex: 1 }}
+                        onClick={() => handleReview(m.id, "needs_info")}
+                        disabled={updating === m.id}
+                      >
+                        Request info
+                      </button>
+                      <button
+                        style={{ ...styles.actionBtn, color: "#ff4466", borderColor: "#ff446644", flex: 1 }}
+                        onClick={() => handleReview(m.id, "declined")}
+                        disabled={updating === m.id}
+                      >
+                        ✗ Decline
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
