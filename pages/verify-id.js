@@ -36,8 +36,9 @@ const STATUS_CONFIG = {
   approved: {
     badge: "You're in",
     color: '#7ed9a8',
-    message: "Congratulations — you've been selected as a founding member of Hush After Hours. The club opens soon. Your next step is to create your photorealistic avatar so you're ready to walk in on opening day.",
-    showAvatarCta: true,
+    message: "Congratulations — you've been selected as a founding member of Hush After Hours. The club opens soon.",
+    showLoungeCta: true,
+    showAvatarOptIn: true,
   },
   avatar_complete: {
     badge: 'All set',
@@ -199,12 +200,14 @@ export default function VerifyId() {
               </>
             )}
 
-            {cfg.showAvatarCta && (
-              <a href="/avatar" className={styles.ctaBtn}>Create My Avatar →</a>
-            )}
-
             {cfg.showLoungeCta && (
               <a href="/lounge" className={styles.ctaBtn}>Enter the Lounge →</a>
+            )}
+
+            {cfg.showAvatarOptIn && (
+              <p className={styles.hint}>
+                Want a photorealistic avatar for opening day? <a href="/avatar">Set one up anytime</a> — no rush.
+              </p>
             )}
           </div>
         </div>

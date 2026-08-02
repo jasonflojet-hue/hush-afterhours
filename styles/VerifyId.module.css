@@ -113,6 +113,11 @@
   line-height: 1.6;
 }
 
+.hint a {
+  color: #c9a96e;
+  text-decoration: underline;
+}
+
 .ctaBtn {
   display: inline-block;
   background: linear-gradient(135deg, #ff2d9b, #9b4dca);

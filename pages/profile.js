@@ -194,12 +194,17 @@ export default function Profile() {
       return
     }
 
+    // mobile_phone is required (not just email) so that by the time an
+    // applicant reaches admin review, we have two independent ways to
+    // reach/verify them on file -- not tied to avatar setup, which is a
+    // separate, optional step post-approval (see verify-id.js).
     const isComplete = Boolean(
       form.display_name.trim() &&
       form.birth_date &&
       form.gender.length > 0 &&
       form.looking_for.length > 0 &&
-      form.interested_in.length > 0
+      form.interested_in.length > 0 &&
+      form.mobile_phone.trim()
     )
 
     setSaving(true)
@@ -550,10 +555,11 @@ export default function Profile() {
               <input id="country" type="text" value={form.country} onChange={(e) => set('country', e.target.value)} />
             </div>
             <div className={styles.field}>
-              <label htmlFor="mobile_phone">Mobile phone</label>
+              <label htmlFor="mobile_phone">Mobile phone *</label>
               <input
                 id="mobile_phone"
                 type="tel"
+                required
                 value={form.mobile_phone}
                 onChange={(e) => set('mobile_phone', e.target.value)}
                 placeholder="For account security — not shown to other members"

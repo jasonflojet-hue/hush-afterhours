@@ -62,10 +62,12 @@ export default function Login() {
 
       if (!profile?.profile_complete) {
         router.push('/profile')
-      } else if (profile.account_status === 'avatar_complete') {
+      } else if (['approved', 'avatar_complete'].includes(profile.account_status)) {
+        // Approval is the real gate -- we already have phone + confirmed
+        // email on file by this point. Avatar creation is a nice-to-have
+        // members can do anytime from the nav, not a hard requirement
+        // blocking entry (see verify-id.js).
         router.push('/lounge')
-      } else if (profile.account_status === 'approved') {
-        router.push('/avatar')
       } else {
         // pending_verification, awaiting_id, pending_review, needs_info, declined
         router.push('/verify-id')
