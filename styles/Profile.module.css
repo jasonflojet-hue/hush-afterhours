@@ -81,6 +81,15 @@
   border-color: #c9a96e;
 }
 
+/* Native <option> list ignores the dark theme by default (white bg, and
+   since the <select>'s own text color is near-white, unselected options
+   were nearly invisible until hovered). Forcing background+color here
+   keeps the dropdown readable and on-brand across Chrome/Edge/Firefox. */
+.field select option {
+  background: #12101a;
+  color: #f5f0e8;
+}
+
 .field textarea { resize: vertical; min-height: 90px; }
 
 .hint {
