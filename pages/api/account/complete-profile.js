@@ -69,7 +69,7 @@ export default async function handler(req, res) {
             <p style="color:#c9c2d6;line-height:1.8;margin-bottom:16px">
               Because Hush is a private members club, we verify every applicant. Please upload proof that you are 18+ (a government-issued ID). You may cover sensitive details like your ID number, as long as your name, photo, and date of birth remain visible.
             </p>
-            <a href="${siteUrl}/verify-id" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#ff2d9b,#9b4dca);color:#fff;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;margin-top:8px">Upload ID →</a>
+            <a href="${siteUrl}/profile" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#ff2d9b,#9b4dca);color:#fff;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;margin-top:8px">Upload ID →</a>
             <p style="color:#666680;font-size:12px;margin-top:24px">Your application is now Pending Review.</p>
             <p style="color:#333355;font-size:11px;margin-top:32px">© 2026 KontraBand Entertainment LLC · hushafterhours.live</p>
           </div>

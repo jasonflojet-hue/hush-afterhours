@@ -102,7 +102,7 @@ export default async function handler(req, res) {
             <img src="https://hushafterhours.live/hush-logo.png" alt="Hush" style="width:120px;margin-bottom:24px" />
             <h1 style="font-size:24px;font-weight:400;margin-bottom:16px;color:#f8f4ff">We need one more thing.</h1>
             <p style="color:#c9c2d6;line-height:1.8;margin-bottom:16px">${notes || 'Please re-submit a clearer photo of your ID.'}</p>
-            <a href="${siteUrl}/verify-id" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#ff2d9b,#9b4dca);color:#fff;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;margin-top:8px">Resubmit →</a>
+            <a href="${siteUrl}/profile" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#ff2d9b,#9b4dca);color:#fff;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;margin-top:8px">Resubmit →</a>
             <p style="color:#333355;font-size:11px;margin-top:32px">© 2026 KontraBand Entertainment LLC · hushafterhours.live</p>
           </div>
         `

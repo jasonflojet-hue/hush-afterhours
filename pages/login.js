@@ -69,8 +69,10 @@ export default function Login() {
         // blocking entry (see verify-id.js).
         router.push('/lounge')
       } else {
-        // pending_verification, awaiting_id, pending_review, needs_info, declined
-        router.push('/verify-id')
+        // pending_verification, awaiting_id, pending_review, needs_info, declined --
+        // the verification status card now lives at the bottom of /profile
+        // instead of its own page.
+        router.push('/profile')
       }
     }
     setLoading(false)

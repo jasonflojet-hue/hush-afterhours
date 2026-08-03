@@ -71,7 +71,7 @@ export default function Members() {
         {error === 'not_approved' && (
           <div className={styles.gateCard}>
             <p>You'll be able to browse other members once your application is approved.</p>
-            <a href="/verify-id" className={styles.gateBtn}>Check your status →</a>
+            <a href="/profile" className={styles.gateBtn}>Check your status →</a>
           </div>
         )}
 

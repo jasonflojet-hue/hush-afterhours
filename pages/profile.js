@@ -5,6 +5,52 @@ import Nav from '../components/Nav'
 import { supabase } from '../lib/supabase'
 import { ORIENTATION_TAGS, OrientationIcon } from '../components/OrientationTags'
 import styles from '../styles/Profile.module.css'
+import vstyles from '../styles/VerifyId.module.css'
+
+// Membership verification now lives at the bottom of this page instead of
+// its own /verify-id route -- one place to look, not a redirect chain.
+const STATUS_CONFIG = {
+  pending_verification: {
+    badge: 'Confirm your email',
+    color: '#e8a13f',
+    message: 'Please confirm your email first — check your inbox for the link we sent when you signed up.',
+  },
+  awaiting_id: {
+    badge: 'Action needed',
+    color: '#e8a13f',
+    message: "Hush is a private members club, so we verify every applicant. Upload a government-issued ID that shows your name, photo, and date of birth — you're welcome to cover your ID number.",
+    showUpload: true,
+  },
+  pending_review: {
+    badge: 'Pending review',
+    color: '#c9a96e',
+    message: "Your ID has been submitted. Our team reviews every applicant personally — we'll email you as soon as there's a decision.",
+  },
+  needs_info: {
+    badge: 'More info needed',
+    color: '#e8a13f',
+    message: 'Our team needs a clearer or different ID photo before we can continue.',
+    showUpload: true,
+  },
+  declined: {
+    badge: 'Application declined',
+    color: '#e24b4a',
+    message: "We weren't able to approve your application at this time.",
+  },
+  approved: {
+    badge: "You're in",
+    color: '#7ed9a8',
+    message: "Congratulations — you've been selected as a founding member of Hush After Hours. The club opens soon.",
+    showLoungeCta: true,
+    showAvatarOptIn: true,
+  },
+  avatar_complete: {
+    badge: 'All set',
+    color: '#7ed9a8',
+    message: "You're fully set up. See you at Hush.",
+    showLoungeCta: true,
+  },
+}
 
 const GENDER_OPTIONS = ['Woman', 'Man', 'Non-binary', 'Trans woman', 'Trans man', 'Genderfluid', 'Other']
 const LOOKING_FOR_OPTIONS = [
@@ -68,6 +114,11 @@ export default function Profile() {
   const [wasComplete, setWasComplete] = useState(false)
   const [photoError, setPhotoError] = useState('')
   const [uploadingSlot, setUploadingSlot] = useState(null)
+  const [accountStatus, setAccountStatus] = useState(null)
+  const [reviewNotes, setReviewNotes] = useState(null)
+  const [idFile, setIdFile] = useState(null)
+  const [idUploading, setIdUploading] = useState(false)
+  const [idError, setIdError] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -112,8 +163,61 @@ export default function Profile() {
         orientation_tags: data.orientation_tags || [],
       })
       setWasComplete(Boolean(data.profile_complete))
+      setAccountStatus(data.account_status)
+      setReviewNotes(data.review_notes)
     }
     setLoading(false)
+  }
+
+  const handleIdFilePick = (e) => {
+    const f = e.target.files?.[0]
+    setIdError('')
+    if (!f) return
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+    if (!allowed.includes(f.type)) {
+      setIdError('Please upload a JPG, PNG, WEBP, or PDF.')
+      return
+    }
+    if (f.size > 8 * 1024 * 1024) {
+      setIdError('File must be under 8MB.')
+      return
+    }
+    setIdFile(f)
+  }
+
+  const handleIdUpload = async () => {
+    if (!idFile) return
+    setIdUploading(true)
+    setIdError('')
+
+    const ext = idFile.name.split('.').pop()
+    const path = `${session.user.id}/id-${Date.now()}.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('id-documents')
+      .upload(path, idFile, { upsert: true })
+
+    if (uploadError) {
+      setIdUploading(false)
+      setIdError('Something went wrong uploading that file. Please try again.')
+      return
+    }
+
+    const res = await fetch('/api/account/submit-id', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ path }),
+    })
+
+    setIdUploading(false)
+
+    if (!res.ok) {
+      setIdError('Your file uploaded, but we couldn\'t record it. Please try again.')
+      return
+    }
+
+    setIdFile(null)
+    setAccountStatus('pending_review')
   }
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
@@ -260,10 +364,8 @@ export default function Profile() {
         method: 'POST',
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
-        .then(() => {
-          // Brief pause so "Profile saved." is actually visible before we
-          // move them on to the verification step.
-          setTimeout(() => router.push('/verify-id'), 900)
+        .then((res) => {
+          if (res.ok) setAccountStatus('awaiting_id')
         })
         .catch(() => {})
     }
@@ -284,6 +386,8 @@ export default function Profile() {
       </>
     )
   }
+
+  const statusCfg = STATUS_CONFIG[accountStatus] || STATUS_CONFIG.pending_verification
 
   return (
     <>
@@ -575,6 +679,62 @@ export default function Profile() {
             {saving ? 'Saving…' : 'Save profile'}
           </button>
         </form>
+
+        {accountStatus && (
+          <div className={vstyles.wrap}>
+            <div className={vstyles.card}>
+              <span
+                className={vstyles.statusBadge}
+                style={{ background: `${statusCfg.color}22`, color: statusCfg.color, border: `0.5px solid ${statusCfg.color}55` }}
+              >
+                {statusCfg.badge}
+              </span>
+              <p className={vstyles.statusMsg}>{statusCfg.message}</p>
+
+              {accountStatus === 'needs_info' && reviewNotes && (
+                <div className={vstyles.notesBox}>
+                  <strong>Note from our team:</strong> {reviewNotes}
+                </div>
+              )}
+
+              {statusCfg.showUpload && (
+                <>
+                  <label className={vstyles.dropZone}>
+                    {idFile ? idFile.name : 'Click to choose a file (JPG, PNG, WEBP, or PDF)'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      style={{ display: 'none' }}
+                      onChange={handleIdFilePick}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className={vstyles.uploadBtn}
+                    onClick={handleIdUpload}
+                    disabled={!idFile || idUploading}
+                  >
+                    {idUploading ? 'Uploading…' : 'Submit ID'}
+                  </button>
+                  {idError && <p className={vstyles.errorMsg}>{idError}</p>}
+                  <p className={vstyles.hint}>
+                    Stored privately and only visible to our review team. Never shown on your public profile.
+                  </p>
+                </>
+              )}
+
+              {statusCfg.showLoungeCta && (
+                <a href="/lounge" className={vstyles.ctaBtn}>Enter the Lounge →</a>
+              )}
+
+              {statusCfg.showAvatarOptIn && (
+                <p className={vstyles.hint}>
+                  Want a photorealistic avatar for opening day? <a href="/avatar">Set one up anytime</a> — no rush.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </>
   )
